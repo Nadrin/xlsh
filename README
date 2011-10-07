@@ -1,0 +1,4 @@
+xlsh - X Login Shell
+(c) 2011 Michał Siejak
+
+A very simple, text-based X display manager without XDMCP server component.
