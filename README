@@ -1,4 +1,9 @@
-xlsh - X Login Shell
+xlsh - eXtended Login Shell
 (c) 2011 Michał Siejak
 
-A very simple, text-based X display manager without XDMCP server component.
+A simple login shell with readline functionality and PAM integration.
+ * When run stand-alone on a virtual console it can replace standard "login" program.
+ * When run in cooperation with X daemon component (xlshd) it can replace XDM/GDM/KDM.
+
+The only build dependencies are: make, a decent C compiler, libreadline and libpam.
+Configuration options can be edited in src/config.h before compiling.
