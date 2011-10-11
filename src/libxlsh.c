@@ -17,12 +17,13 @@
 
 static sigset_t xlsh_default_sigmask;
 
-void libxlsh_sigmask(void)
+// Process functions
+void libxlsh_proc_sigmask(void)
 {
   sigprocmask(0, NULL, &xlsh_default_sigmask);
 }
 
-pid_t libxlsh_exec(const char* cmdline, int flags)
+pid_t libxlsh_proc_exec(const char* cmdline, int flags)
 {
   pid_t pid;
   int i;
@@ -47,6 +48,7 @@ pid_t libxlsh_exec(const char* cmdline, int flags)
   exit(EXIT_FAILURE);
 }
 
+// Pid read/write functions
 pid_t libxlsh_pid_read(const char* filename)
 {
   pid_t result  = 0;
@@ -74,5 +76,34 @@ int libxlsh_pid_lock(const char* filename, pid_t pid, int flags)
     return XLSH_ERROR;
   fprintf(pidfile, "%d", pid);
   fclose(pidfile);
+  return XLSH_EOK;
+}
+
+// File IO functions
+int libxlsh_file_read(const char* filename, char** buffer, size_t* bufsize)
+{
+  FILE*  file;
+  size_t filesize, bytes_read;
+
+  if(!(file = fopen(filename, "r")))
+    return XLSH_ENOTFOUND;
+
+  fseek(file, 0, SEEK_END);
+  filesize = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  *buffer = malloc(filesize + 1);
+  if(bufsize) *bufsize = filesize + 1;
+  if(!*buffer) {
+    fclose(file);
+    return XLSH_ERROR;
+  }
+  bytes_read = fread(*buffer, 1, filesize, file);
+  fclose(file);
+  
+  if(bytes_read != filesize) {
+    free(*buffer);
+    return XLSH_ERROR;
+  } 
   return XLSH_EOK;
 }

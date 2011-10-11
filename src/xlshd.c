@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), XLSH_OVERWRITE);
   }
 
-  libxlsh_sigmask();
+  libxlsh_proc_sigmask();
 
   sigemptyset(&sigmask);
   sigaddset(&sigmask, SIGHUP);
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     xrc_pid      = 0;
     
     snprintf(buffer, PATH_MAX, "%s %s %s", XLSHD_XSERVER, XLSHD_XOPTIONS, opt_display);
-    if((xserver_pid = libxlsh_exec(buffer, 0)) < 0) {
+    if((xserver_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
       retval = EXIT_FAILURE;
       break;
     }
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     sleep(XLSHD_XWAIT);
 
     snprintf(buffer, PATH_MAX, "%s %s", XLSHD_SHELL, XLSHD_XLSHRC);
-    if((xrc_pid = libxlsh_exec(buffer, 0)) < 0) {
+    if((xrc_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
       kill(xserver_pid, SIGTERM);
       retval = EXIT_FAILURE;
       break;

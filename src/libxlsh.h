@@ -22,9 +22,10 @@
 #define XLSH_OVERWRITE 0x01
 #define XLSH_DETACH    0x02
 
-void  libxlsh_sigmask(void);
-pid_t libxlsh_exec(const char* cmdline, int flags);
+void  libxlsh_proc_sigmask(void);
+pid_t libxlsh_proc_exec(const char* cmdline, int flags);
 pid_t libxlsh_pid_read(const char* filename);
 int   libxlsh_pid_lock(const char* filename, pid_t pid, int flags);
+int   libxlsh_file_read(const char* filename, char** buffer, size_t* bufsize);
 
 #endif
