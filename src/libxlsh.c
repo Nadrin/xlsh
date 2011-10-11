@@ -12,8 +12,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "config.h"
-#include "libxlsh.h"
+#include <config.h>
+#include <libxlsh.h>
 
 static sigset_t xlsh_default_sigmask;
 

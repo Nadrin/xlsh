@@ -21,9 +21,9 @@
 #include <readline/history.h>
 #include <security/pam_appl.h>
 
-#include "config.h"
-#include "libxlsh.h"
-#include "xlsh.h"
+#include <config.h>
+#include <libxlsh.h>
+#include <xlsh.h>
 
 // Static data
 static xlsh_config_item_t xlsh_config[] = {
@@ -199,7 +199,6 @@ int xlsh_session_showissue(const char* issuefile)
       curptr += printf("%s", curptr);
   } while(curptr < endptr);
 
-  fputc('\n', stdout);
   free(buffer);
   return XLSH_EOK;
 }

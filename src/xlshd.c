@@ -16,8 +16,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#include "config.h"
-#include "libxlsh.h"
+#include <config.h>
+#include <libxlsh.h>
 
 static void xlshd_usage(const char* argv0)
 {
