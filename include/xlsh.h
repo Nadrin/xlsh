@@ -12,6 +12,9 @@ typedef enum xlsh_config_id_e {
   XLSH_ID_REBOOT,
   XLSH_ID_HALT,
   XLSH_ID_PROMPT,
+  XLSH_ID_ISSUE,
+  XLSH_ID_DATEFMT,
+  XLSH_ID_TIMEFMT,
   XLSH_ID_TMPDIR,
   XLSH_ID_PATH,
   XLSH_ID_DISPLAY,
@@ -31,6 +34,16 @@ typedef struct xlsh_command_s {
   xlsh_func_t callback;
 } xlsh_command_t;
 
+typedef struct xlsh_system_s {
+  struct utsname un;
+  char date[100];
+  char time[100];
+  char ttyname[256];
+  char ttypath[256];
+  char hostname[256];
+  char domainname[256];
+} xlsh_system_t;
+
 void xlsh_config_init(char* exec_arg);
 void xlsh_config_free(void);
 void xlsh_config_set(xlsh_config_item_t* item, const char* value);
@@ -46,6 +59,9 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
 
 int xlsh_session_tty(const char* user, const char* shell);
 int xlsh_session_x(const char* user, const char* shell);
+
+int xlsh_sys_getinfo(xlsh_system_t* sysinfo);
+int xlsh_sys_issue(const char* issuefile);
 
 int xlsh_func_exit(int argc, char** argv);
 int xlsh_func_help(int argc, char** argv);

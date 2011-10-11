@@ -10,7 +10,7 @@
 // Tweak parameters to suit your needs before compiling.
 
 #define XLSH_EXEC      "./.xsession"
-#define XLSH_PROMPT    "%s (%s)> "
+#define XLSH_PROMPT    "%s> "
 #define XLSH_TMPDIR    "/tmp"
 #define XLSH_SHELLS    "/etc/shells"
 #define XLSH_ISSUE     "/etc/issue"
@@ -19,6 +19,8 @@
 #define XLSH_HALT      "/sbin/shutdown -h now"
 #define XLSH_XTTY      "/dev/console"
 #define XLSH_XTTY_NAME "X11"
+#define XLSH_DATEFMT   "%Y-%m-%d"
+#define XLSH_TIMEFMT   "%H:%M"
 
 #define XLSHD_TMPDIR   XLSH_TMPDIR
 #define XLSHD_SHELL    "/bin/sh"

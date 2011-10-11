@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <limits.h>
 #include <errno.h>
@@ -16,6 +17,7 @@
 #include <grp.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/utsname.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -31,6 +33,9 @@ static xlsh_config_item_t xlsh_config[] = {
   { "XLSH_REBOOT", XLSH_REBOOT, NULL },
   { "XLSH_HALT", XLSH_HALT, NULL },
   { "XLSH_PROMPT", XLSH_PROMPT, NULL },
+  { "XLSH_ISSUE", XLSH_ISSUE, NULL },
+  { "XLSH_DATEFMT", XLSH_DATEFMT, NULL },
+  { "XLSH_TIMEFMT", XLSH_TIMEFMT, NULL },
   { "XLSH_TMPDIR", XLSH_TMPDIR, NULL },
   { "PATH", XLSH_PATH, NULL },
   { "DISPLAY", NULL, NULL },
@@ -173,36 +178,6 @@ static int xlsh_session_conv(int num_msg, const struct pam_message** msg,
 }
 
 // Session management
-int xlsh_session_showissue(const char* issuefile)
-{
-  char*  buffer;
-  size_t buffer_size;
-  char  *curptr, *nextptr, *endptr;
-  
-  int    errflag;
-  char   escflag;
-
-  if((errflag = libxlsh_file_read(issuefile, &buffer, &buffer_size)) != XLSH_EOK)
-    return errflag;
-
-  curptr = buffer;
-  endptr = buffer + buffer_size - 1;
-  do {
-    nextptr = strchr(curptr, '\\');
-    if(nextptr) {
-      *nextptr = 0;
-      escflag  = *(++nextptr);
-      curptr  += (printf("%s", curptr) + 2);
-      printf("[%c]", escflag);
-    }
-    else
-      curptr += printf("%s", curptr);
-  } while(curptr < endptr);
-
-  free(buffer);
-  return XLSH_EOK;
-}
-
 char* xlsh_session_getshell(char* buffer, const char* shell, size_t bufsize)
 {
   char  readbuf[bufsize];
@@ -476,6 +451,9 @@ void xlsh_config_init(char* exec_arg)
   xlsh_config_set(&xlsh_config[XLSH_ID_REBOOT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_HALT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_PROMPT], NULL);
+  xlsh_config_set(&xlsh_config[XLSH_ID_ISSUE], NULL);
+  xlsh_config_set(&xlsh_config[XLSH_ID_TIMEFMT], NULL);
+  xlsh_config_set(&xlsh_config[XLSH_ID_DATEFMT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_TMPDIR], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_PATH], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_DISPLAY], NULL);
@@ -522,23 +500,16 @@ int xlsh_cmd_loop(void)
   char *cmd_argv[256];
   char *line, *argptr;
 
-  char  sys_hostname[64];
-  char  sys_ttypath[64];
-  char* sys_ttyname;
-  char  prompt[256];
-
+  char prompt[256];
+  xlsh_system_t sysinfo;
   xlsh_command_t* command = NULL;
+  
   int retvalue = XLSH_EOK;
 
-  if(gethostname(sys_hostname, 64) != 0)
-    strcpy(sys_hostname, "localhost");
-  if(xlsh_X || ttyname_r(0, sys_ttypath, 64) != 0)
-    sys_ttyname = XLSH_XTTY_NAME;
-  else
-    sys_ttyname = sys_ttypath + 5;
-
-  snprintf(prompt, 256, xlsh_config[XLSH_ID_PROMPT].value,
-	   sys_hostname, sys_ttyname);
+  xlsh_sys_getinfo(&sysinfo);
+  snprintf(prompt, 256,
+	   xlsh_config[XLSH_ID_PROMPT].value,
+	   sysinfo.ttyname);
   
   while((line = xlsh_cmd_readline(prompt))) {
     cmd_argc = 0;
@@ -572,6 +543,99 @@ int xlsh_cmd_loop(void)
   return EXIT_FAILURE;
 }
 
+// System information
+int xlsh_sys_getinfo(xlsh_system_t* sysinfo)
+{
+  struct tm *tminfo;
+  time_t timeval;
+  
+  char* disp_name, *tty_name;
+  char  tty_path[PATH_MAX];
+  
+  memset(sysinfo, 0, sizeof(xlsh_system_t));
+  uname(&sysinfo->un);
+  if(gethostname(sysinfo->hostname, sizeof(sysinfo->hostname)) != 0)
+    strcpy(sysinfo->hostname, "localhost");
+  if(getdomainname(sysinfo->domainname, sizeof(sysinfo->domainname)) != 0)
+    strcpy(sysinfo->domainname, "localdomain");
+  if(ttyname_r(0, tty_path, sizeof(tty_path)) != 0)
+    strcpy(tty_path, XLSH_XTTY);
+  strncpy(sysinfo->ttypath, tty_path + 5, sizeof(sysinfo->ttypath));
+  
+  if(xlsh_X) {
+    disp_name = getenv("DISPLAY");
+    if(disp_name[0] == ':')
+      disp_name++;
+    sprintf(tty_path, "%s/%s", XLSH_XTTY_NAME, disp_name);
+    tty_name = tty_path;
+  }
+  else
+    tty_name = tty_path;
+  strncpy(sysinfo->ttyname, tty_name, sizeof(sysinfo->ttyname));
+  
+  timeval = time(NULL);
+  tminfo  = localtime(&timeval);
+  if(tminfo) {
+    strftime(sysinfo->time, sizeof(sysinfo->time),
+	     xlsh_config[XLSH_ID_TIMEFMT].value, tminfo);
+    strftime(sysinfo->date, sizeof(sysinfo->date),
+	     xlsh_config[XLSH_ID_DATEFMT].value, tminfo);
+  }
+  else
+    return XLSH_ERROR;
+  
+  return XLSH_EOK;
+}
+
+int xlsh_sys_issue(const char* issuefile)
+{
+  int errflag;
+    
+  char*  buffer;
+  size_t buffer_size;
+  char  *curptr, *nextptr, *endptr;
+  
+  const char* value;
+  xlsh_system_t sysinfo;
+
+  if(!issuefile)
+    return XLSH_EOK;
+  if((errflag = libxlsh_file_read(issuefile, &buffer, &buffer_size)) != XLSH_EOK)
+    return errflag;
+
+  xlsh_sys_getinfo(&sysinfo);
+  
+  curptr = buffer;
+  endptr = buffer + buffer_size - 1;
+  do {
+    nextptr = strchr(curptr, '\\');
+    if(nextptr) {
+      *nextptr = 0;
+      switch(*(++nextptr)) {
+      case 's': value = sysinfo.un.sysname; break;
+      case 'm': value = sysinfo.un.machine; break;
+      case 'r': value = sysinfo.un.release; break;
+      case 'v': value = sysinfo.un.version; break;
+      case 't': value = sysinfo.time; break;
+      case 'd': value = sysinfo.date; break;
+      case 'l': value = sysinfo.ttypath; break;
+      case 'n': value = sysinfo.hostname; break;
+      case 'o': value = sysinfo.domainname; break;
+      default:  value = NULL;
+      }
+
+      curptr += (printf("%s", curptr) + 2);
+      if(value)
+	printf("%s", value);
+    }
+    else
+      curptr += printf("%s", curptr);
+  } while(curptr < endptr);
+
+  free(buffer);
+  return XLSH_EOK;
+}
+
 // Main program
 int main(int argc, char** argv)
 {
@@ -600,7 +664,7 @@ int main(int argc, char** argv)
     xlsh_X = 1;
   
   xlsh_config_init(opt_exec);
-  xlsh_session_showissue(XLSH_ISSUE);
+  xlsh_sys_issue(xlsh_config[XLSH_ID_ISSUE].value);
   
   retvalue = xlsh_cmd_loop();
   
