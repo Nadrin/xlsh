@@ -10,7 +10,7 @@
 // Tweak parameters to suit your needs before compiling.
 
 #define XLSH_EXEC      "./.xsession"
-#define XLSH_PROMPT    "%s> "
+#define XLSH_PROMPT    "xlsh (%s)> "
 #define XLSH_TMPDIR    "/tmp"
 #define XLSH_SHELLS    "/etc/shells"
 #define XLSH_ISSUE     "/etc/issue"

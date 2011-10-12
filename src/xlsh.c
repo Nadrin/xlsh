@@ -32,7 +32,6 @@ static xlsh_config_item_t xlsh_config[] = {
   { "XLSH_EXEC", XLSH_EXEC, NULL },
   { "XLSH_REBOOT", XLSH_REBOOT, NULL },
   { "XLSH_HALT", XLSH_HALT, NULL },
-  { "XLSH_PROMPT", XLSH_PROMPT, NULL },
   { "XLSH_ISSUE", XLSH_ISSUE, NULL },
   { "XLSH_DATEFMT", XLSH_DATEFMT, NULL },
   { "XLSH_TIMEFMT", XLSH_TIMEFMT, NULL },
@@ -450,7 +449,6 @@ void xlsh_config_init(char* exec_arg)
 
   xlsh_config_set(&xlsh_config[XLSH_ID_REBOOT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_HALT], NULL);
-  xlsh_config_set(&xlsh_config[XLSH_ID_PROMPT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_ISSUE], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_TIMEFMT], NULL);
   xlsh_config_set(&xlsh_config[XLSH_ID_DATEFMT], NULL);
@@ -507,9 +505,7 @@ int xlsh_cmd_loop(void)
   int retvalue = XLSH_EOK;
 
   xlsh_sys_getinfo(&sysinfo);
-  snprintf(prompt, 256,
-	   xlsh_config[XLSH_ID_PROMPT].value,
-	   sysinfo.ttyname);
+  snprintf(prompt, 256, XLSH_PROMPT, sysinfo.ttyname);
   
   while((line = xlsh_cmd_readline(prompt))) {
     cmd_argc = 0;
@@ -626,7 +622,7 @@ int xlsh_sys_issue(const char* issuefile)
 
       curptr += (printf("%s", curptr) + 2);
       if(value)
-	printf("%s", value);
+				printf("%s", value);
     }
     else
       curptr += printf("%s", curptr);

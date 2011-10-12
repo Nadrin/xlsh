@@ -11,7 +11,6 @@ typedef enum xlsh_config_id_e {
   XLSH_ID_EXEC = 0,
   XLSH_ID_REBOOT,
   XLSH_ID_HALT,
-  XLSH_ID_PROMPT,
   XLSH_ID_ISSUE,
   XLSH_ID_DATEFMT,
   XLSH_ID_TIMEFMT,
@@ -52,8 +51,9 @@ int xlsh_cmd_loop(void);
 
 char* xlsh_session_getpass(char* buffer, size_t bufsize);
 char* xlsh_session_getstring(char* buffer, size_t bufsize);
+
 int   xlsh_session_open(const char* service, const char* user,
-  		        pam_handle_t** handle);
+												pam_handle_t** handle);
 int xlsh_session_close(pam_handle_t* handle);
 int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg0);
 
