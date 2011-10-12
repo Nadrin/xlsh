@@ -1,0 +1,16 @@
+#!/bin/sh
+# XLSH default startup script for X11.
+TERMINAL=xterm
+XRESFILE=/etc/xlsh/Xresources
+
+screen_w=$(xwininfo -root | grep Width | cut -f2 -d':')
+screen_h=$(xwininfo -root | grep Height | cut -f2 -d':')
+px=$(($screen_w/2 - 240))
+py=$(($screen_h/2 - 150))
+
+if ! which xlsh; then
+  xmessage -center 'xlsh cannot be found in PATH!'
+  exit 1
+fi
+[ -f "$XRESFILE" ] && xrdb "$XRESFILE"
+exec $TERMINAL -g 80x24+$px+$py $(which xlsh)

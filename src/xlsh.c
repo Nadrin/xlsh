@@ -285,6 +285,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
   const char* pwname;
   char terminal[256];
   pid_t proc_shell;
+	int   proc_wait = 0;
 
   const char* _arg0 = arg0;
   if(!arg0) _arg0 = session;
@@ -315,10 +316,14 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
     setenv("HOME", pwinfo->pw_dir, 1);
     setenv("PATH", xlsh_config[XLSH_ID_PATH].value, 1);
     
-    if(xlsh_config[XLSH_ID_DISPLAY].value)
+    if(xlsh_X) {
       setenv("DISPLAY", xlsh_config[XLSH_ID_DISPLAY].value, 1);
+			if(libxlsh_proc_exec(XLSH_XRDB, 0) > 0)
+				wait(&proc_wait);
+		}
     else
       setenv("SHELL", session, 1);
+		
     if(terminal[0])
       setenv("TERM", terminal, 1);
 
