@@ -492,6 +492,31 @@ static char* xlsh_cmd_readline(const char* prompt)
   }
 }
 
+static char* xlsh_cmd_match(const char* text, int state)
+{
+	static size_t index, len;
+	char* cmd_name;
+
+	if(!state) {
+		index = 0;
+		len   = strlen(text);
+	}	
+	while((cmd_name = (char*)xlsh_commands[index++].name)) {
+		if(strncmp(cmd_name, text, len) == 0)
+			return strdup(cmd_name);
+	}
+	return NULL;
+}
+
+static char** xlsh_cmd_complete(const char* text, int start, int end)
+{
+	if(start == 0)
+		return rl_completion_matches((char*)text, xlsh_cmd_match);
+	else
+		return rl_completion_matches((char*)text,
+																 rl_username_completion_function);
+}
+
 int xlsh_cmd_loop(void)
 {
   int  i, cmd_argc;
@@ -506,7 +531,8 @@ int xlsh_cmd_loop(void)
 
   xlsh_sys_getinfo(&sysinfo);
   snprintf(prompt, 256, XLSH_PROMPT, sysinfo.ttyname);
-  
+
+	rl_attempted_completion_function = xlsh_cmd_complete;
   while((line = xlsh_cmd_readline(prompt))) {
     cmd_argc = 0;
     argptr   = strtok(line, " ");
@@ -518,7 +544,7 @@ int xlsh_cmd_loop(void)
     command = xlsh_commands;
     do {
       if(strcmp(command->name, cmd_argv[0]) == 0)
-	break;
+				break;
     } while((++command)->name);
 
     if(command->name)
