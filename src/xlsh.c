@@ -570,7 +570,7 @@ int xlsh_sys_getinfo(xlsh_system_t* sysinfo)
     tty_name = tty_path;
   }
   else
-    tty_name = tty_path;
+    tty_name = tty_path + 5;
   strncpy(sysinfo->ttyname, tty_name, sizeof(sysinfo->ttyname));
   
   timeval = time(NULL);
