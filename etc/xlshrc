@@ -9,11 +9,12 @@ screen_h=$(xwininfo -root | grep Height | cut -f2 -d':')
 px=$(($screen_w/2 - 240))
 py=$(($screen_h/2 - 150))
 
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin
+export PATH
 if ! which xlsh; then
   xmessage -center 'xlsh cannot be found in PATH!'
   exit 1
 fi
-
 xrdb -merge "$XRESFILE"
 xsetroot -solid "$BGCOLOR"
 exec $TERMINAL -g 80x24+$px+$py $(which xlsh)
