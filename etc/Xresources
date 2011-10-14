@@ -1,5 +1,5 @@
 ! Default resources for XLSH xterm instance.
-*foreground:  white
-*background:  black
-*cursorColor: grey90
+*foreground:  #FFD7AF
+*background:  #1F1F1F
+*cursorColor: #B99B86
 *visualBell:  off

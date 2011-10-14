@@ -45,7 +45,7 @@ static xlsh_command_t xlsh_commands[] = {
   { "login", "   : Logins specified user into the system", xlsh_func_login },
   { "reboot", "  : Reboots the system", xlsh_func_reboot },
   { "shutdown", ": Halts the system", xlsh_func_shutdown },
-  { "exit", "    : Quits login shell", xlsh_func_exit },
+  { "exit",   "  : Exits (reloads) login shell", xlsh_func_exit },
   { "help", "    : Prints all available commands", xlsh_func_help },
   { "version", " : Prints copyright and version information", xlsh_func_version },
   { NULL, NULL, NULL },
@@ -121,7 +121,8 @@ int xlsh_func_reboot(int argc, char** argv)
   xlshd_pid = libxlsh_pid_read(XLSHD_PIDFILE);
   if(xlshd_pid > 0)
     kill(xlshd_pid, SIGTERM);
-  
+
+  pause();
   return XLSH_EDONE;
 }
 
@@ -138,7 +139,8 @@ int xlsh_func_shutdown(int argc, char** argv)
   xlshd_pid = libxlsh_pid_read(XLSHD_PIDFILE);
   if(xlshd_pid > 0)
     kill(xlshd_pid, SIGTERM);
-  
+
+  pause();
   return XLSH_EDONE;
 }
 
@@ -285,7 +287,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
   const char* pwname;
   char terminal[256];
   pid_t proc_shell;
-	int   proc_wait = 0;
+  int   proc_wait = 0;
 
   const char* _arg0 = arg0;
   if(!arg0) _arg0 = session;
@@ -318,9 +320,9 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
     
     if(xlsh_X) {
       setenv("DISPLAY", xlsh_config[XLSH_ID_DISPLAY].value, 1);
-			if(libxlsh_proc_exec(XLSH_XRDB, 0) > 0)
-				wait(&proc_wait);
-		}
+      if(libxlsh_proc_exec(XLSH_XRDB, 0) > 0)
+	wait(&proc_wait);
+    }
     else
       setenv("SHELL", session, 1);
 		
@@ -499,27 +501,27 @@ static char* xlsh_cmd_readline(const char* prompt)
 
 static char* xlsh_cmd_match(const char* text, int state)
 {
-	static size_t index, len;
-	char* cmd_name;
+  static size_t index, len;
+  char* cmd_name;
 
-	if(!state) {
-		index = 0;
-		len   = strlen(text);
-	}	
-	while((cmd_name = (char*)xlsh_commands[index++].name)) {
-		if(strncmp(cmd_name, text, len) == 0)
-			return strdup(cmd_name);
-	}
-	return NULL;
+  if(!state) {
+    index = 0;
+    len   = strlen(text);
+  }	
+  while((cmd_name = (char*)xlsh_commands[index++].name)) {
+    if(strncmp(cmd_name, text, len) == 0)
+      return strdup(cmd_name);
+  }
+  return NULL;
 }
 
 static char** xlsh_cmd_complete(const char* text, int start, int end)
 {
-	if(start == 0)
-		return rl_completion_matches((char*)text, xlsh_cmd_match);
-	else
-		return rl_completion_matches((char*)text,
-																 rl_username_completion_function);
+  if(start == 0)
+    return rl_completion_matches((char*)text, xlsh_cmd_match);
+  else
+    return rl_completion_matches((char*)text,
+				 rl_username_completion_function);
 }
 
 int xlsh_cmd_loop(void)
@@ -537,7 +539,7 @@ int xlsh_cmd_loop(void)
   xlsh_sys_getinfo(&sysinfo);
   snprintf(prompt, 256, XLSH_PROMPT, sysinfo.ttyname);
 
-	rl_attempted_completion_function = xlsh_cmd_complete;
+  rl_attempted_completion_function = xlsh_cmd_complete;
   while((line = xlsh_cmd_readline(prompt))) {
     cmd_argc = 0;
     argptr   = strtok(line, " ");
@@ -549,7 +551,7 @@ int xlsh_cmd_loop(void)
     command = xlsh_commands;
     do {
       if(strcmp(command->name, cmd_argv[0]) == 0)
-				break;
+	break;
     } while((++command)->name);
 
     if(command->name)
@@ -653,7 +655,7 @@ int xlsh_sys_issue(const char* issuefile)
 
       curptr += (printf("%s", curptr) + 2);
       if(value)
-				printf("%s", value);
+	printf("%s", value);
     }
     else
       curptr += printf("%s", curptr);

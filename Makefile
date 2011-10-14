@@ -26,6 +26,10 @@ install: all
 	install -m 644 etc/xlshrc ${CONFDIR}/xlsh
 	install -m 644 etc/Xresources ${CONFDIR}/xlsh
 
+uninstall:
+	rm -f ${DESTDIR}/sbin/xlsh
+	rm -f ${DESTDIR}/sbin/xlshd
+
 clean:
 	rm -f xlsh xlshd
 

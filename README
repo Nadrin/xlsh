@@ -19,6 +19,7 @@ Features:
  * Only *three* important commands: 'login', 'reboot' and 'shutdown'.
  * New commands can be easily added (if you need any) by editing xlsh.c
  * Username autocompletion on TAB.
+ * Zenburn color scheme (when run under X).
 
 The only build dependencies are: make, a decent C compiler, libreadline and libpam.
 Configuration options can be edited in include/config.h before compiling.

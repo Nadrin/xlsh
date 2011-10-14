@@ -85,6 +85,7 @@ int main(int argc, char** argv)
 {
   int  opt_index          = 1;
   int  opt_nodaemon       = 0;
+  
   const char* opt_display = XLSHD_XDISPLAY;
 
   char buffer[PATH_MAX];

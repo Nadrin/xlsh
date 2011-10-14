@@ -2,6 +2,7 @@
 # XLSH default startup script for X11.
 TERMINAL=xterm
 XRESFILE=/etc/xlsh/Xresources
+BGCOLOR="rgb:1E/23/1F"
 
 screen_w=$(xwininfo -root | grep Width | cut -f2 -d':')
 screen_h=$(xwininfo -root | grep Height | cut -f2 -d':')
@@ -12,5 +13,7 @@ if ! which xlsh; then
   xmessage -center 'xlsh cannot be found in PATH!'
   exit 1
 fi
-[ -f "$XRESFILE" ] && xrdb "$XRESFILE"
+
+xrdb -merge "$XRESFILE"
+xsetroot -solid "$BGCOLOR"
 exec $TERMINAL -g 80x24+$px+$py $(which xlsh)
