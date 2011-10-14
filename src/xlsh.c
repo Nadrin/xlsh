@@ -45,7 +45,7 @@ static xlsh_command_t xlsh_commands[] = {
   { "login", "   : Logins specified user into the system", xlsh_func_login },
   { "reboot", "  : Reboots the system", xlsh_func_reboot },
   { "shutdown", ": Halts the system", xlsh_func_shutdown },
-  { "exit",   "  : Exits (reloads) login shell", xlsh_func_exit },
+  { "exit", "    : Exits (reloads) login shell", xlsh_func_exit },
   { "help", "    : Prints all available commands", xlsh_func_help },
   { "version", " : Prints copyright and version information", xlsh_func_version },
   { NULL, NULL, NULL },
