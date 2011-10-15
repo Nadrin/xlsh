@@ -1,36 +1,61 @@
 # xlsh - eXtended Login Shell
 # See COPYING file for license details.
 
-DESTDIR ?= /usr/local
-CONFDIR ?= /etc
+.DEFAULT_GOAL = all
+.PHONY: all install install-strip installdirs uninstall clean
 
-XLSH_SOURCE   = src/xlsh.c src/libxlsh.c
-XLSH_HEADERS  = include/xlsh.h include/libxlsh.h include/config.h
+prefix = /usr/local
+exec_prefix = $(prefix)
+bin_dir = $(exec_prefix)/bin
+sbindir = $(exec_prefix)/sbin
+datarootdir = $(prefix)/share
+datadir = $(datarootdir)
+sysconfdir = $(prefix)/etc
+sharedstatedir = $(prefix)/com
+localstatedir = $(prefix)/var
+
+CFLAGS = -I./include
+
+vpath %.c ./src
+
+PROGRAMS      = xlsh xlshd
+
+XLSH_OBJ      = xlsh.o libxlsh.o
+XLSH_SOURCE   = xlsh.c libxlsh.c
+XLSH_HEADERS  = xlsh.h libxlsh.h config.h
 XLSH_LIBS     = -lreadline -lpam
 
-XLSHD_SOURCE  = src/xlshd.c src/libxlsh.c
-XLSHD_HEADERS = include/config.h include/libxlsh.h
+XLSHD_OBJ     = xlshd.o libxlsh.o
+XLSHD_SOURCE  = xlshd.c libxlsh.c
+XLSHD_HEADERS = config.h libxlsh.h
 
-all: xlsh xlshd
+all: $(PROGRAMS)
 
-xlsh: ${XLSH_SOURCE} ${XLSH_HEADERS}
-	${CC} -g -Wall -o $@ -I./include ${XLSH_SOURCE} ${CFLAGS} ${LDFLAGS} ${XLSH_LIBS}
+xlsh: $(XLSH_OBJ) $(XLSH_LIBS)
 
-xlshd: ${XLSHD_SOURCE} ${XLSHD_HEADERS}
-	${CC} -g -Wall -o $@ -I./include ${XLSHD_SOURCE} ${CFLAGS} ${LDFLAGS}
+xlshd: $(XLSHD_OBJ)
 
-install: all
-	install -m 755 xlsh ${DESTDIR}/sbin/
-	install -m 755 xlshd ${DESTDIR}/sbin/
-	install -d -m 755 ${CONFDIR}/xlsh
-	install -m 644 etc/xlshrc ${CONFDIR}/xlsh
-	install -m 644 etc/Xresources ${CONFDIR}/xlsh
+install: installdirs
+	install -m 755 xlsh $(DESTDIR)$(sbindir)
+	install -m 755 xlshd $(DESTDIR)$(sbindir)
+	install -d -m 755 $(DESTDIR)$(sysconfdir)/xlsh
+	install -m 644 etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
+	install -m 644 etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
+
+install-strip: installdirs
+	install -s -m 755 xlsh $(DESTDIR)$(sbindir)
+	install -s -m 755 xlshd $(DESTDIR)$(sbindir)
+	install -m 644 etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
+	install -m 644 etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
+
+installdirs:
+	install -d $(DESTDIR)$(sbindir) $(DESTDIR)$(sysconfdir)/xlsh
 
 uninstall:
-	rm -f ${DESTDIR}/sbin/xlsh
-	rm -f ${DESTDIR}/sbin/xlshd
+	rm -f ${DESTDIR}$(sbindir)/xlsh
+	rm -f ${DESTDIR}$(sbindir)/xlshd
 
 clean:
-	rm -f xlsh xlshd
+	rm -f $(PROGRAMS)
+	rm -f $(XLSH_OBJ) $(XLSHD_OBJ)
 
-.PHONY: all install clean
