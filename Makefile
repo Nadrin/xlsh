@@ -25,6 +25,7 @@ INSTALL_PROGRAM_STRIP = $(INSTALL) -s
 CFLAGS += -g -Wall
 ALL_CFLAGS = -I./include $(CFLAGS)
 
+.SUFFIXES:
 .SUFFIXES: .o
 vpath %.c ./src
 
@@ -69,4 +70,4 @@ clean:
 	rm -f $(XLSH_OBJ) $(XLSHD_OBJ)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $(ALL_CFLAGS) $< -o $@
+	$(CC) -c $(CPPFLAGS) $(ALL_CFLAGS) $< -o $@
