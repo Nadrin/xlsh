@@ -521,7 +521,7 @@ static char** xlsh_cmd_complete(const char* text, int start, int end)
     return rl_completion_matches((char*)text, xlsh_cmd_match);
   else
     return rl_completion_matches((char*)text,
-				 rl_username_completion_function);
+				 libxlsh_username_completion_function);
 }
 
 int xlsh_cmd_loop(void)

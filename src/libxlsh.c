@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pwd.h>
 
 #include <config.h>
 #include <libxlsh.h>
@@ -106,4 +107,54 @@ int libxlsh_file_read(const char* filename, char** buffer, size_t* bufsize)
     return XLSH_ERROR;
   } 
   return XLSH_EOK;
+}
+
+
+/* A completion function for usernames. */
+char* libxlsh_username_completion_function(const char* text, int state)
+{
+  static char* username = (char*) NULL;
+  static struct passwd* entry;
+  static int namelen;
+  char* value;
+
+  if(state == 0)
+  {
+    if(username)
+      free(username);
+    namelen = strlen(text);
+    username = malloc(namelen + 1);
+    strcpy(username, text);
+    setpwent();
+  }
+
+  while((entry = getpwent()))
+  {
+#if XLSHD_COMPLETION_SHOWROOT == 1
+    if(entry->pw_uid != 0
+        && (entry->pw_uid < XLSHD_COMPLETION_MINUID
+            || entry->pw_uid >= XLSHD_COMPLETION_MAXUID))
+#else
+    if(entry->pw_uid == 0
+        || entry->pw_uid < XLSHD_COMPLETION_MINUID
+        || entry->pw_uid >= XLSHD_COMPLETION_MAXUID)
+#endif
+      continue;
+    /* Null usernames should result in all users as possible completions. */
+    if(namelen == 0 || (STREQN(username, entry->pw_name, namelen)))
+	    break;
+  }
+
+  if(entry == 0)
+  {
+    endpwent();
+    return ((char*) NULL);
+  }
+  else
+  {
+    value = malloc(2 + strlen(entry->pw_name));
+    *value = *text;
+    strcpy(value, entry->pw_name);
+    return (value);
+  }
 }

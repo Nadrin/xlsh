@@ -22,10 +22,16 @@
 #define XLSH_OVERWRITE 0x01
 #define XLSH_DETACH    0x02
 
+#if !defined (STREQN)
+#define STREQN(a, b, n) (((n) == 0) ? (1) \
+          : ((a)[0] == (b)[0]) && (strncmp ((a), (b), (n)) == 0))
+#endif
+
 void  libxlsh_proc_sigmask(void);
 pid_t libxlsh_proc_exec(const char* cmdline, int flags);
 pid_t libxlsh_pid_read(const char* filename);
 int   libxlsh_pid_lock(const char* filename, pid_t pid, int flags);
 int   libxlsh_file_read(const char* filename, char** buffer, size_t* bufsize);
+char* libxlsh_username_completion_function(const char* text, int state);
 
 #endif
