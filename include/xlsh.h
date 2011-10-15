@@ -7,6 +7,11 @@
 #ifndef __XLSH_H
 #define __XLSH_H
 
+#if !defined (STREQN)
+#define STREQN(a, b, n) (((n) == 0) ? (1) \
+          : ((a)[0] == (b)[0]) && (strncmp ((a), (b), (n)) == 0))
+#endif
+
 typedef enum xlsh_config_id_e {
   XLSH_ID_EXEC = 0,
   XLSH_ID_REBOOT,
