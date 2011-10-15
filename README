@@ -19,7 +19,21 @@ Features:
  * Only *three* important commands: 'login', 'reboot' and 'shutdown'.
  * New commands can be easily added (if you need any) by editing xlsh.c
  * Username autocompletion on TAB.
- * Zenburn color scheme (when run under X).
+ * Zenburn color scheme by default (when run under X).
 
 The only build dependencies are: make, a decent C compiler, libreadline and libpam.
 Configuration options can be edited in include/config.h before compiling.
+
+When using xlsh as "login" replacement remember to tell your getty program to not
+ask for username. When using xlshd from inittab specify -f flag so it won't fork
+into background.
+
+Example lines from my inittab file:
+
+# xlsh on virtual console #1 (tty1)
+c1:2345:respawn:/sbin/agetty -8 -s 38400 -n -l /usr/local/sbin/xlsh tty1 linux
+# xlshd starting X server and xterm/xlsh on runlevel 5
+x:5:respawn:/usr/local/sbin/xlshd -f
+
+Please report any bugs or issues either via github or via mail to:
+  <my_firstname@my_lastname.pl>

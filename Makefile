@@ -5,6 +5,7 @@
 .PHONY: all install install-strip installdirs uninstall clean
 
 prefix = /usr/local
+
 exec_prefix = $(prefix)
 bin_dir = $(exec_prefix)/bin
 sbindir = $(exec_prefix)/sbin
@@ -24,9 +25,7 @@ INSTALL_PROGRAM_STRIP = $(INSTALL) -s
 CFLAGS += -g -Wall
 ALL_CFLAGS = -I./include $(CFLAGS)
 
-.SUFFIXES:
 .SUFFIXES: .o
-
 vpath %.c ./src
 
 PROGRAMS      = xlsh xlshd
@@ -70,4 +69,4 @@ clean:
 	rm -f $(XLSH_OBJ) $(XLSHD_OBJ)
 
 %.o: %.c
-	$(CC) -c $(CPPFLAGS) $(ALL_CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(ALL_CFLAGS) $< -o $@
