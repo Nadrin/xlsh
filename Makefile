@@ -14,7 +14,18 @@ sysconfdir = $(prefix)/etc
 sharedstatedir = $(prefix)/com
 localstatedir = $(prefix)/var
 
-CFLAGS += -I./include -g -Wall
+SHELL = /bin/sh
+INSTALL = /usr/bin/install
+INSTALL_DIR = $(INSTALL) -d
+INSTALL_DATA = $(INSTALL) -m 644
+INSTALL_PROGRAM = $(INSTALL)
+INSTALL_PROGRAM_STRIP = $(INSTALL) -s
+
+CFLAGS += -g -Wall
+ALL_CFLAGS = -I./include $(CFLAGS)
+
+.SUFFIXES:
+.SUFFIXES: .o
 
 vpath %.c ./src
 
@@ -36,20 +47,19 @@ xlsh: $(XLSH_OBJ) $(XLSH_LIBS)
 xlshd: $(XLSHD_OBJ)
 
 install: installdirs
-	install -m 755 xlsh $(DESTDIR)$(sbindir)
-	install -m 755 xlshd $(DESTDIR)$(sbindir)
-	install -d -m 755 $(DESTDIR)$(sysconfdir)/xlsh
-	install -m 644 etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
-	install -m 644 etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_PROGRAM) xlsh $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) xlshd $(DESTDIR)$(sbindir)
+	$(INSTALL_DATA) etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DATA) etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
 
 install-strip: installdirs
-	install -s -m 755 xlsh $(DESTDIR)$(sbindir)
-	install -s -m 755 xlshd $(DESTDIR)$(sbindir)
-	install -m 644 etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
-	install -m 644 etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_PROGRAM_STRIP) xlsh $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM_STRIP) xlshd $(DESTDIR)$(sbindir)
+	$(INSTALL_DATA) etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DATA) etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
 
 installdirs:
-	install -d $(DESTDIR)$(sbindir) $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DIR) $(DESTDIR)$(sbindir) $(DESTDIR)$(sysconfdir)/xlsh
 
 uninstall:
 	rm -f ${DESTDIR}$(sbindir)/xlsh
@@ -59,3 +69,5 @@ clean:
 	rm -f $(PROGRAMS)
 	rm -f $(XLSH_OBJ) $(XLSHD_OBJ)
 
+%.o: %.c
+	$(CC) -c $(CPPFLAGS) $(ALL_CFLAGS) $< -o $@
