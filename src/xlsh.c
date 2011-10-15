@@ -566,6 +566,7 @@ char* xlsh_username_match(const char* text, int state)
 
 static char** xlsh_cmd_complete(const char* text, int start, int end)
 {
+  rl_attempted_completion_over = 1;
   if(start == 0)
     return rl_completion_matches((char*)text, xlsh_cmd_match);
   else
