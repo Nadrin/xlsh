@@ -14,7 +14,7 @@ sysconfdir = $(prefix)/etc
 sharedstatedir = $(prefix)/com
 localstatedir = $(prefix)/var
 
-CFLAGS = -I./include
+CFLAGS += -I./include -g -Wall
 
 vpath %.c ./src
 
