@@ -12,9 +12,14 @@ py=$(($screen_h/2 - 120))
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin
 export PATH
 if ! which xlsh; then
-  xmessage -center 'xlsh cannot be found in PATH!'
+  xmessage -center "xlsh cannot be found in PATH!"
   exit 1
 fi
+
 xrdb -merge "$XRESFILE"
 xsetroot -solid "$BGCOLOR"
+if which xdotool; then
+  ( xwindow=$(xdotool search --sync --class $TERMINAL)
+    xdotool windowfocus "$xwindow" )&
+fi
 exec $TERMINAL -g 80x15+$px+$py $(which xlsh)

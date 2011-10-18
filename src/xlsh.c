@@ -521,7 +521,7 @@ static char* xlsh_cmd_match_user(const char* text, int state)
   static size_t len;
   static struct passwd* pw_entry;
 
-  int force_show;
+  int force_show = 0;
 
   if(!state) {
     setpwent();
