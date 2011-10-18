@@ -23,6 +23,10 @@
 #define XLSH_DATEFMT   "%Y-%m-%d"
 #define XLSH_TIMEFMT   "%H:%M"
 
+#define XLSH_COMPLETION_SHOWROOT 1
+#define XLSH_COMPLETION_MINUID   1000
+#define XLSH_COMPLETION_MAXUID   65534
+
 #define XLSHD_TMPDIR   XLSH_TMPDIR
 #define XLSHD_SHELL    "/bin/sh"
 #define XLSHD_PIDFILE  "/var/run/xlshd.pid"
@@ -32,9 +36,5 @@
 #define XLSHD_XLSHRC   "/etc/xlsh/xlshrc"
 #define XLSHD_XWAIT    1
 #define XLSHD_XRETRY   2
-
-#define XLSHD_COMPLETION_SHOWROOT 1
-#define XLSHD_COMPLETION_MINUID   1000
-#define XLSHD_COMPLETION_MAXUID   65534
 
 #endif

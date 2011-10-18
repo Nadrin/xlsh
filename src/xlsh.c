@@ -499,7 +499,7 @@ static char* xlsh_cmd_readline(const char* prompt)
   }
 }
 
-static char* xlsh_cmd_match(const char* text, int state)
+static char* xlsh_cmd_match_command(const char* text, int state)
 {
   static size_t index, len;
   char* cmd_name;
@@ -515,63 +515,42 @@ static char* xlsh_cmd_match(const char* text, int state)
   return NULL;
 }
 
-/* A completion function for usernames. */
-char* xlsh_username_match(const char* text, int state)
+static char* xlsh_cmd_match_user(const char* text, int state)
 {
-  static char* username = (char*) NULL;
-  static struct passwd* entry;
-  static int namelen;
-  char* value;
+  static char* username = NULL;
+  static size_t len;
+  static struct passwd* pw_entry;
 
-  if(state == 0)
-  {
-    if(username)
-      free(username);
-    namelen = strlen(text);
-    username = malloc(namelen + 1);
-    strcpy(username, text);
+  int force_show;
+
+  if(!state) {
     setpwent();
+    len = strlen(text);
   }
-
-  while((entry = getpwent()))
-  {
-#if XLSHD_COMPLETION_SHOWROOT == 1
-    if(entry->pw_uid != 0
-        && (entry->pw_uid < XLSHD_COMPLETION_MINUID
-            || entry->pw_uid >= XLSHD_COMPLETION_MAXUID))
-#else
-    if(entry->pw_uid == 0
-        || entry->pw_uid < XLSHD_COMPLETION_MINUID
-        || entry->pw_uid >= XLSHD_COMPLETION_MAXUID)
+  while((pw_entry = getpwent())) {
+#if XLSH_COMPLETION_SHOWROOT == 1
+    force_show = pw_entry->pw_uid?0:1;
 #endif
+    if(!force_show &&
+       (pw_entry->pw_uid < XLSH_COMPLETION_MINUID ||
+	pw_entry->pw_uid > XLSH_COMPLETION_MAXUID))
       continue;
-    /* Null usernames should result in all users as possible completions. */
-    if(namelen == 0 || (STREQN(username, entry->pw_name, namelen)))
-	    break;
+    if(strncmp(pw_entry->pw_name, text, len) == 0)
+      return strdup(pw_entry->pw_name);
   }
-
-  if(entry == 0)
-  {
-    endpwent();
-    return ((char*) NULL);
-  }
-  else
-  {
-    value = malloc(2 + strlen(entry->pw_name));
-    *value = *text;
-    strcpy(value, entry->pw_name);
-    return (value);
-  }
+  endpwent();
+  return NULL;
 }
 
 static char** xlsh_cmd_complete(const char* text, int start, int end)
 {
   rl_attempted_completion_over = 1;
   if(start == 0)
-    return rl_completion_matches((char*)text, xlsh_cmd_match);
+    return rl_completion_matches((char*)text,
+				 xlsh_cmd_match_command);
   else
     return rl_completion_matches((char*)text,
-				 xlsh_username_match);
+				 xlsh_cmd_match_user);
 }
 
 int xlsh_cmd_loop(void)
