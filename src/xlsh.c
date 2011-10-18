@@ -517,10 +517,8 @@ static char* xlsh_cmd_match_command(const char* text, int state)
 
 static char* xlsh_cmd_match_user(const char* text, int state)
 {
-  static char* username = NULL;
   static size_t len;
   static struct passwd* pw_entry;
-
   int force_show = 0;
 
   if(!state) {
