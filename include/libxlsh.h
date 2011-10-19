@@ -8,7 +8,7 @@
 #define __XLSH_LIBXLSH_H
 
 #define XLSH_VERSION_API    2
-#define XLSH_VERSION_STRING "0.2.0"
+#define XLSH_VERSION_STRING "0.2.1"
 
 #define XLSH_EOK       0x00
 #define XLSH_EFATAL    0x01

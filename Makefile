@@ -51,6 +51,7 @@ install: installdirs
 	$(INSTALL_PROGRAM) xlshd $(DESTDIR)$(sbindir)
 	$(INSTALL_DATA) etc/xlshrc $(DESTDIR)$(sysconfdir)/xlsh
 	$(INSTALL_DATA) etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DATA) etc/pam.d/xlshd $(DESTDIR)$(sysconfdir)/pam.d
 
 install-strip: installdirs
 	$(INSTALL_PROGRAM_STRIP) xlsh $(DESTDIR)$(sbindir)

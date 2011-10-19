@@ -347,7 +347,7 @@ int xlsh_session_tty(const char* user, const char* shell)
   char user_shell[PATH_MAX];
   char user_shell_name[PATH_MAX];
   
-  if(xlsh_session_open("login", user, &pam_handle) != XLSH_EOK) {
+  if(xlsh_session_open(XLSH_PAM_TTY, user, &pam_handle) != XLSH_EOK) {
     fprintf(stderr, "Authorization failed\n");
     return XLSH_ERROR;
   }
@@ -393,7 +393,7 @@ int xlsh_session_x(const char* user, const char* shell)
   pam_handle_t* pam_handle;
   
   if((proc_session = fork()) == 0) {
-    if(xlsh_session_open("login", user, &pam_handle) != XLSH_EOK) {
+    if(xlsh_session_open(XLSH_PAM_X11, user, &pam_handle) != XLSH_EOK) {
       fprintf(stderr, "Authorization failed\n");
       exit(EXIT_FAILURE);
     }

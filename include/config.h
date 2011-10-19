@@ -22,6 +22,8 @@
 #define XLSH_XTTY_NAME "X11"
 #define XLSH_DATEFMT   "%Y-%m-%d"
 #define XLSH_TIMEFMT   "%H:%M"
+#define XLSH_PAM_TTY   "login"
+#define XLSH_PAM_X11   "xlshd"
 
 #define XLSH_COMPLETION_SHOWROOT 1
 #define XLSH_COMPLETION_MINUID   1000
