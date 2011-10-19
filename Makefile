@@ -7,13 +7,9 @@
 prefix = /usr/local
 
 exec_prefix = $(prefix)
-bin_dir = $(exec_prefix)/bin
-sbindir = $(exec_prefix)/sbin
-datarootdir = $(prefix)/share
-datadir = $(datarootdir)
-sysconfdir = $(prefix)/etc
-sharedstatedir = $(prefix)/com
-localstatedir = $(prefix)/var
+bindir      = $(exec_prefix)/bin
+sbindir     = $(exec_prefix)/sbin
+sysconfdir  = /etc
 
 SHELL = /bin/sh
 INSTALL = /usr/bin/install
