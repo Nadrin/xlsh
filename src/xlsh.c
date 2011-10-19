@@ -95,7 +95,7 @@ int xlsh_func_login(int argc, char** argv)
   char* arg_shell = argc>=3?argv[2]:NULL;
 
   if(!arg_user) {
-    fprintf(stderr, "No username specified\n");
+    fprintf(stderr, "usage: %s <username> [shell/wm]\n", argv[0]);
     return XLSH_EARG;
   }
 

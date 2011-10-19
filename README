@@ -9,6 +9,7 @@ Features:
  * Small and simple, written entirely in C.
  * Easily hackable because of compact codebase (~1000 source lines).
  * Uses PAM for authorization and session management.
+ * Ability to select non-default shell/window manager during logon.
  * Entirely keyboard driven display manager replacement (when used with xlshd)
    without the need for any fat libraries or GUI toolkits.
  * Defaults configured before compilation, some of them can be changed by
