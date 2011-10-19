@@ -56,7 +56,9 @@ install-strip: installdirs
 	$(INSTALL_DATA) etc/Xresources $(DESTDIR)$(sysconfdir)/xlsh
 
 installdirs:
-	$(INSTALL_DIR) $(DESTDIR)$(sbindir) $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
+	$(INSTALL_DIR) $(DESTDIR)$(sysconfdir)/xlsh
+	$(INSTALL_DIR) $(DESTDIR)$(sysconfdir)/pam.d
 
 uninstall:
 	rm -f ${DESTDIR}$(sbindir)/xlsh
