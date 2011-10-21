@@ -12,7 +12,7 @@ sbindir     = $(exec_prefix)/sbin
 sysconfdir  = /etc
 
 SHELL = /bin/sh
-INSTALL = /usr/bin/install
+INSTALL = install
 INSTALL_DIR = $(INSTALL) -d
 INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_PROGRAM = $(INSTALL)
@@ -38,7 +38,8 @@ XLSHD_HEADERS = config.h libxlsh.h
 
 all: $(PROGRAMS)
 
-xlsh: $(XLSH_OBJ) $(XLSH_LIBS)
+xlsh: $(XLSH_OBJ)
+xlsh: LDLIBS=$(XLSH_LIBS)
 
 xlshd: $(XLSHD_OBJ)
 

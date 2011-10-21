@@ -5,6 +5,9 @@ A simple login shell with readline functionality and PAM integration.
  * When run stand-alone on a virtual console it can replace standard "login" program.
  * When run in cooperation with X daemon component (xlshd) it can replace XDM/GDM/KDM.
 
+Full documentation can be found here:
+ * https://github.com/Nadrin/xlsh/wiki
+
 Features:
  * Small and simple, written entirely in C.
  * Easily hackable because of compact codebase (~1000 source lines).
