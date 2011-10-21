@@ -22,4 +22,4 @@ if which xdotool; then
   ( xwindow=$(xdotool search --sync --class $TERMINAL)
     xdotool windowfocus "$xwindow" )&
 fi
-exec $TERMINAL -g 80x15+$px+$py $(which xlsh)
+exec $TERMINAL -g 80x15+$px+$py -e $(which xlsh)
