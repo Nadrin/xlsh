@@ -210,7 +210,8 @@ char* xlsh_session_getpass(char* buffer, size_t bufsize)
 
   fflush(stdin);
   fgets(buffer, bufsize, stdin);
-  pass_len = strnlen(buffer, bufsize-1);
+  pass_len = strlen(buffer);
+  pass_len = pass_len > bufsize-1 ? bufsize-1 : pass_len;
   if(buffer[pass_len-1] == '\n')
     buffer[pass_len-1] = 0;
 
@@ -226,7 +227,8 @@ char* xlsh_session_getstring(char* buffer, size_t bufsize)
   
   fflush(stdin);
   fgets(buffer, bufsize, stdin);
-  string_len = strnlen(buffer, bufsize-1);
+  string_len = strlen(buffer);
+  string_len = string_len > bufsize-1 ? bufsize-1 : string_len;
   
   if(buffer[string_len-1] == '\n')
     buffer[string_len-1] = 0;
