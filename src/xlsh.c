@@ -210,7 +210,7 @@ char* xlsh_session_getpass(char* buffer, size_t bufsize)
 
   fflush(stdin);
   fgets(buffer, bufsize, stdin);
-  pass_len = strnlen(buffer, bufsize-1);
+  pass_len = libxlsh_strnlen(buffer, bufsize-1);
   if(buffer[pass_len-1] == '\n')
     buffer[pass_len-1] = 0;
 
@@ -226,7 +226,7 @@ char* xlsh_session_getstring(char* buffer, size_t bufsize)
   
   fflush(stdin);
   fgets(buffer, bufsize, stdin);
-  string_len = strnlen(buffer, bufsize-1);
+  string_len = libxlsh_strnlen(buffer, bufsize-1);
   
   if(buffer[string_len-1] == '\n')
     buffer[string_len-1] = 0;
@@ -502,13 +502,13 @@ static char* xlsh_cmd_readline(const char* prompt)
 static char* xlsh_cmd_match_command(const char* text, int state)
 {
   static size_t index, len;
-  char* cmd_name;
+  const char* cmd_name;
 
   if(!state) {
     index = 0;
     len   = strlen(text);
   }	
-  while((cmd_name = (char*)xlsh_commands[index++].name)) {
+  while((cmd_name = xlsh_commands[index++].name)) {
     if(strncmp(cmd_name, text, len) == 0)
       return strdup(cmd_name);
   }
@@ -542,12 +542,16 @@ static char* xlsh_cmd_match_user(const char* text, int state)
 
 static char** xlsh_cmd_complete(const char* text, int start, int end)
 {
+  union { const char* cc; char* c; } const_cast;
+  
+  const_cast.cc = text;
   rl_attempted_completion_over = 1;
+  
   if(start == 0)
-    return rl_completion_matches((char*)text,
+    return rl_completion_matches(const_cast.c,
 				 xlsh_cmd_match_command);
   else
-    return rl_completion_matches((char*)text,
+    return rl_completion_matches(const_cast.c,
 				 xlsh_cmd_match_user);
 }
 

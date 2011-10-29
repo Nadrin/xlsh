@@ -18,6 +18,14 @@
 
 static sigset_t xlsh_default_sigmask;
 
+// Compatibility functions
+size_t libxlsh_strnlen(const char* s, size_t maxlen)
+{
+  size_t len = 0;
+  while(*s++ && ++len < maxlen);
+  return len;
+}
+
 // Process functions
 void libxlsh_proc_sigmask(void)
 {

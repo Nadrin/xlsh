@@ -18,8 +18,9 @@ INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_PROGRAM_STRIP = $(INSTALL) -s
 
-CFLAGS += -g -Wall
-ALL_CFLAGS = -I./include $(CFLAGS)
+CMACROS = -D_POSIX_C_SOURCE=199309L -D_BSD_SOURCE
+CFLAGS += -g -std=c99 -pedantic -Wall -Wcast-qual -Wpointer-arith -fstrict-aliasing
+ALL_CFLAGS = -I./include $(CFLAGS) $(CMACROS)
 
 .SUFFIXES:
 .SUFFIXES: .o
