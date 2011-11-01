@@ -310,7 +310,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
     if(getenv("TERM"))
       strncpy(terminal, getenv("TERM"), 256);
     else
-      terminal[0] = 0;
+      *terminal = 0;
     
     clearenv();
     setenv("USER", pwinfo->pw_name, 1);
@@ -319,6 +319,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
     setenv("PATH", xlsh_config[XLSH_ID_PATH].value, 1);
     
     if(xlsh_X) {
+      setenv("SHELL", pwinfo->pw_shell, 1);
       setenv("DISPLAY", xlsh_config[XLSH_ID_DISPLAY].value, 1);
       if(libxlsh_proc_exec(XLSH_XRDB, 0) > 0)
 	wait(&proc_wait);
@@ -326,7 +327,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
     else
       setenv("SHELL", session, 1);
 		
-    if(terminal[0])
+    if(*terminal)
       setenv("TERM", terminal, 1);
 
     execlp(session, _arg0, (char*)0);
