@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     setenv("DISPLAY", opt_display, 1);
     sleep(XLSHD_XWAIT);
 
-    snprintf(buffer, PATH_MAX, "%s %s", XLSHD_SHELL, XLSHD_XLSHRC);
+    snprintf(buffer, PATH_MAX, "%s", XLSHD_TERM);
     if((xrc_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
       kill(xserver_pid, SIGTERM);
       retval = EXIT_FAILURE;

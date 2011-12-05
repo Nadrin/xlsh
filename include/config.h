@@ -30,12 +30,11 @@
 #define XLSH_COMPLETION_MAXUID   65534
 
 #define XLSHD_TMPDIR   XLSH_TMPDIR
-#define XLSHD_SHELL    "/bin/sh"
+#define XLSHD_TERM     "/usr/bin/xterm -g 80x15+0+0 -fg #ffd7af -bg #1f1f1f -cr #b99b86 -fn fixed +sb -e /usr/local/sbin/xlsh"
 #define XLSHD_PIDFILE  "/var/run/xlshd.pid"
 #define XLSHD_XSERVER  "/usr/bin/X"
 #define XLSHD_XOPTIONS "-nolisten tcp -noreset"
 #define XLSHD_XDISPLAY ":0"
-#define XLSHD_XLSHRC   "/etc/xlsh/xlshrc"
 #define XLSHD_XWAIT    1
 #define XLSHD_XRETRY   2
 
