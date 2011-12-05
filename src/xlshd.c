@@ -46,7 +46,7 @@ void xlshd_daemonize(const char* argv0)
   pid_t pid;
   struct sigaction sighandler;
   struct sigaction def_sigchld, def_sigusr1, def_sigalrm;
-  
+
   memset(&sighandler, 0, sizeof(struct sigaction));
   sighandler.sa_handler = xlshd_sig_daemonize;
 
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 {
   int  opt_index          = 1;
   int  opt_nodaemon       = 0;
-  
+
   const char* opt_display = XLSHD_XDISPLAY;
 
   char buffer[PATH_MAX];
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   sigset_t sigmask;
   struct sigaction sighandler;
   int waitflag, retval;
-  
+
   if(argc > opt_index && strcmp(argv[opt_index], "-h")==0)
     xlshd_usage(argv[0]);
   if(argc > opt_index && strcmp(argv[opt_index], "-f")==0) {
@@ -110,19 +110,19 @@ int main(int argc, char** argv)
   switch(libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), 0)) {
   case XLSH_EFOUND:
     fprintf(stderr, "%s: Pidfile %s exists, aborted\n",
-	    argv[0], XLSHD_PIDFILE);
+            argv[0], XLSHD_PIDFILE);
     return EXIT_FAILURE;
   case XLSH_ERROR:
     fprintf(stderr, "%s: Cannot create pidfile: %s\n",
-	    argv[0], XLSHD_PIDFILE);
+            argv[0], XLSHD_PIDFILE);
     return EXIT_FAILURE;
   }
-  
+
   if(!opt_nodaemon) {
     xlshd_daemonize(argv[0]);
     libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), XLSH_OVERWRITE);
   }
-  
+
   stdin  = freopen("/dev/null", "r", stdin);
   stdout = freopen("/dev/null", "w", stdout);
   stderr = freopen("/dev/null", "w", stderr);
@@ -145,13 +145,13 @@ int main(int argc, char** argv)
     xserver_pid  = 0;
     xsession_pid = 0;
     xrc_pid      = 0;
-    
+
     snprintf(buffer, PATH_MAX, "%s %s %s", XLSHD_XSERVER, XLSHD_XOPTIONS, opt_display);
     if((xserver_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
       retval = EXIT_FAILURE;
       break;
     }
-  
+
     setenv("DISPLAY", opt_display, 1);
     sleep(XLSHD_XWAIT);
 
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     xsession_pid = libxlsh_pid_read(buffer);
     if(xsession_pid > 0) {
       while(!kill(xsession_pid, 0) && !xlshd_quit)
-	sleep(XLSHD_XWAIT);
+        sleep(XLSHD_XWAIT);
       unlink(buffer);
     }
 

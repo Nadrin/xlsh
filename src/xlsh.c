@@ -146,15 +146,15 @@ int xlsh_func_shutdown(int argc, char** argv)
 
 // Session management helpers
 static int xlsh_session_conv(int num_msg, const struct pam_message** msg,
-			     struct pam_response** resp, void* appdata_ptr)
+                             struct pam_response** resp, void* appdata_ptr)
 {
   int i;
   char buffer[256];
   size_t resp_size = num_msg * sizeof(struct pam_response);
-  
+
   *resp = malloc(resp_size);
   memset(*resp, 0, resp_size);
-  
+
   for(i=0; i<num_msg; i++) {
     switch(msg[i]->msg_style) {
     case PAM_TEXT_INFO:
@@ -223,25 +223,25 @@ char* xlsh_session_getpass(char* buffer, size_t bufsize)
 char* xlsh_session_getstring(char* buffer, size_t bufsize)
 {
   size_t string_len;
-  
+
   fflush(stdin);
   fgets(buffer, bufsize, stdin);
   string_len = libxlsh_strnlen(buffer, bufsize-1);
-  
+
   if(buffer[string_len-1] == '\n')
     buffer[string_len-1] = 0;
   return buffer;
 }
 
 int xlsh_session_open(const char* service, const char* user,
-		      pam_handle_t** handle)
+                      pam_handle_t** handle)
 {
   struct pam_conv conv = { xlsh_session_conv, NULL };
   pam_handle_t* pam_handle;
 
   if(pam_start(service, user, &conv, &pam_handle) != PAM_SUCCESS)
     return XLSH_ERROR;
-  
+
   if(xlsh_X)
     pam_set_item(pam_handle, PAM_TTY, XLSH_XTTY);
   else
@@ -264,7 +264,7 @@ int xlsh_session_open(const char* service, const char* user,
     pam_end(pam_handle, 0);
     return XLSH_ERROR;
   }
-  
+
   *handle = pam_handle;
   return XLSH_EOK;
 }
@@ -276,7 +276,7 @@ int xlsh_session_close(pam_handle_t* handle)
     pam_end(handle, 0);
     return XLSH_ERROR;
   }
-  
+
   pam_end(handle, 0);
   return XLSH_EOK;
 }
@@ -299,7 +299,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
 
   if((proc_shell = fork()) == 0) {
     chdir(pwinfo->pw_dir);
-    
+
     if(initgroups(pwname, pwinfo->pw_gid) == -1)
       exit(EXIT_FAILURE);
     if(setgid(pwinfo->pw_gid) == -1)
@@ -311,22 +311,22 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
       strncpy(terminal, getenv("TERM"), 256);
     else
       *terminal = 0;
-    
+
     clearenv();
     setenv("USER", pwinfo->pw_name, 1);
     setenv("LOGNAME", pwinfo->pw_name, 1);
     setenv("HOME", pwinfo->pw_dir, 1);
     setenv("PATH", xlsh_config[XLSH_ID_PATH].value, 1);
-    
+
     if(xlsh_X) {
       setenv("SHELL", pwinfo->pw_shell, 1);
       setenv("DISPLAY", xlsh_config[XLSH_ID_DISPLAY].value, 1);
       if(libxlsh_proc_exec(XLSH_XRDB, 0) > 0)
-	wait(&proc_wait);
+        wait(&proc_wait);
     }
     else
       setenv("SHELL", session, 1);
-		
+
     if(*terminal)
       setenv("TERM", terminal, 1);
 
@@ -335,7 +335,7 @@ int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg
   }
   else if(proc_shell == -1)
     return XLSH_ERROR;
-  
+
   return XLSH_EOK;
 }
 
@@ -344,10 +344,10 @@ int xlsh_session_tty(const char* user, const char* shell)
   pam_handle_t* pam_handle;
   struct passwd* pwinfo;
   int waitflag;
-  
+
   char user_shell[PATH_MAX];
   char user_shell_name[PATH_MAX];
-  
+
   if(xlsh_session_open(XLSH_PAM_TTY, user, &pam_handle) != XLSH_EOK) {
     fprintf(stderr, "Authorization failed\n");
     return XLSH_ERROR;
@@ -377,7 +377,7 @@ int xlsh_session_tty(const char* user, const char* shell)
 
   waitflag = 0;
   wait(&waitflag);
-  
+
   xlsh_session_close(pam_handle);
   return XLSH_EDONE;
 }
@@ -390,9 +390,9 @@ int xlsh_session_x(const char* user, const char* shell)
 
   sigset_t sigset[2];
   int      waitflag;
-  
+
   pam_handle_t* pam_handle;
-  
+
   if((proc_session = fork()) == 0) {
     if(xlsh_session_open(XLSH_PAM_X11, user, &pam_handle) != XLSH_EOK) {
       fprintf(stderr, "Authorization failed\n");
@@ -408,7 +408,7 @@ int xlsh_session_x(const char* user, const char* shell)
     waitflag = 0;
     kill(getppid(), SIGUSR1);
     wait(&waitflag);
-    
+
     xlsh_session_close(pam_handle);
     exit(EXIT_SUCCESS);
   }
@@ -422,11 +422,11 @@ int xlsh_session_x(const char* user, const char* shell)
     sigaddset(&sigset[0], SIGCHLD);
     sigaddset(&sigset[0], SIGUSR1);
     sigprocmask(SIG_BLOCK, &sigset[0], &sigset[1]);
-    
+
     snprintf(buffer, PATH_MAX, "%s/.xlsh-%d.pid",
-	     xlsh_config[XLSH_ID_TMPDIR].value, getppid());
+             xlsh_config[XLSH_ID_TMPDIR].value, getppid());
     libxlsh_pid_lock(buffer, proc_session, 1);
-    
+
     proc_result = sigwaitinfo(&sigset[0], NULL);
     sigprocmask(SIG_SETMASK, &sigset[1], NULL);
 
@@ -438,18 +438,18 @@ int xlsh_session_x(const char* user, const char* shell)
       return XLSH_EDONE;
     default:
       fprintf(stderr, "wait() syscall failed for session process: %s\n",
-	      strerror(errno));
+      strerror(errno));
       unlink(buffer);
       return XLSH_ERROR;
     }
   }
-    
+
   return XLSH_EOK;
 }
 
 // Configuration
 void xlsh_config_init(char* exec_arg)
-{     
+{
   if(exec_arg)
     xlsh_config_set(&xlsh_config[XLSH_ID_EXEC], exec_arg);
   else
@@ -508,7 +508,7 @@ static char* xlsh_cmd_match_command(const char* text, int state)
   if(!state) {
     index = 0;
     len   = strlen(text);
-  }	
+  }
   while((cmd_name = xlsh_commands[index++].name)) {
     if(strncmp(cmd_name, text, len) == 0)
       return strdup(cmd_name);
@@ -532,7 +532,7 @@ static char* xlsh_cmd_match_user(const char* text, int state)
 #endif
     if(!force_show &&
        (pw_entry->pw_uid < XLSH_COMPLETION_MINUID ||
-	pw_entry->pw_uid > XLSH_COMPLETION_MAXUID))
+        pw_entry->pw_uid > XLSH_COMPLETION_MAXUID))
       continue;
     if(strncmp(pw_entry->pw_name, text, len) == 0)
       return strdup(pw_entry->pw_name);
@@ -544,16 +544,16 @@ static char* xlsh_cmd_match_user(const char* text, int state)
 static char** xlsh_cmd_complete(const char* text, int start, int end)
 {
   union { const char* cc; char* c; } const_cast;
-  
+
   const_cast.cc = text;
   rl_attempted_completion_over = 1;
-  
+
   if(start == 0)
     return rl_completion_matches(const_cast.c,
-				 xlsh_cmd_match_command);
+                                 xlsh_cmd_match_command);
   else
     return rl_completion_matches(const_cast.c,
-				 xlsh_cmd_match_user);
+                                 xlsh_cmd_match_user);
 }
 
 int xlsh_cmd_loop(void)
@@ -565,7 +565,7 @@ int xlsh_cmd_loop(void)
   char prompt[256];
   xlsh_system_t sysinfo;
   xlsh_command_t* command = NULL;
-  
+
   int retvalue = XLSH_EOK;
 
   xlsh_sys_getinfo(&sysinfo);
@@ -583,14 +583,14 @@ int xlsh_cmd_loop(void)
     command = xlsh_commands;
     do {
       if(strcmp(command->name, cmd_argv[0]) == 0)
-	break;
+        break;
     } while((++command)->name);
 
     if(command->name)
       retvalue = command->callback(cmd_argc, cmd_argv);
     else
       fprintf(stderr, "Unknown command: %s\n", cmd_argv[0]);
-    
+
     for(i=0; i<cmd_argc; i++)
       free(cmd_argv[i]);
     free(line);
@@ -598,7 +598,7 @@ int xlsh_cmd_loop(void)
     if(retvalue == XLSH_EDONE || retvalue == XLSH_EFATAL)
       break;
   }
-  
+
   if(retvalue == XLSH_EOK || retvalue == XLSH_EDONE)
     return EXIT_SUCCESS;
   return EXIT_FAILURE;
@@ -609,10 +609,10 @@ int xlsh_sys_getinfo(xlsh_system_t* sysinfo)
 {
   struct tm *tminfo;
   time_t timeval;
-  
+
   char* disp_name, *tty_name;
   char  tty_path[PATH_MAX];
-  
+
   memset(sysinfo, 0, sizeof(xlsh_system_t));
   uname(&sysinfo->un);
   if(gethostname(sysinfo->hostname, sizeof(sysinfo->hostname)) != 0)
@@ -622,7 +622,7 @@ int xlsh_sys_getinfo(xlsh_system_t* sysinfo)
   if(ttyname_r(0, tty_path, sizeof(tty_path)) != 0)
     strcpy(tty_path, XLSH_XTTY);
   strncpy(sysinfo->ttypath, tty_path + 5, sizeof(sysinfo->ttypath));
-  
+
   if(xlsh_X) {
     disp_name = getenv("DISPLAY");
     if(disp_name[0] == ':')
@@ -633,29 +633,29 @@ int xlsh_sys_getinfo(xlsh_system_t* sysinfo)
   else
     tty_name = tty_path + 5;
   strncpy(sysinfo->ttyname, tty_name, sizeof(sysinfo->ttyname));
-  
+
   timeval = time(NULL);
   tminfo  = localtime(&timeval);
   if(tminfo) {
     strftime(sysinfo->time, sizeof(sysinfo->time),
-	     xlsh_config[XLSH_ID_TIMEFMT].value, tminfo);
+             xlsh_config[XLSH_ID_TIMEFMT].value, tminfo);
     strftime(sysinfo->date, sizeof(sysinfo->date),
-	     xlsh_config[XLSH_ID_DATEFMT].value, tminfo);
+             xlsh_config[XLSH_ID_DATEFMT].value, tminfo);
   }
   else
     return XLSH_ERROR;
-  
+
   return XLSH_EOK;
 }
 
 int xlsh_sys_issue(const char* issuefile)
 {
   int errflag;
-    
+
   char*  buffer;
   size_t buffer_size;
   char  *curptr, *nextptr, *endptr;
-  
+
   const char* value;
   xlsh_system_t sysinfo;
 
@@ -665,7 +665,7 @@ int xlsh_sys_issue(const char* issuefile)
     return errflag;
 
   xlsh_sys_getinfo(&sysinfo);
-  
+
   curptr = buffer;
   endptr = buffer + buffer_size - 1;
   do {
@@ -687,7 +687,7 @@ int xlsh_sys_issue(const char* issuefile)
 
       curptr += (printf("%s", curptr) + 2);
       if(value)
-	printf("%s", value);
+        printf("%s", value);
     }
     else
       curptr += printf("%s", curptr);
@@ -703,7 +703,7 @@ int main(int argc, char** argv)
   char*    opt_exec = NULL;
   int      retvalue;
   sigset_t sigmask;
-  
+
   if(argc > 1) {
     if(strcmp(argv[1], "-h") == 0)
       xlsh_usage(argv[0]);
@@ -714,7 +714,7 @@ int main(int argc, char** argv)
     fprintf(stderr, "%s: You need to have root privileges\n", argv[0]);
     return EXIT_FAILURE;
   }
-  
+
   libxlsh_proc_sigmask();
   sigemptyset(&sigmask);
   sigaddset(&sigmask, SIGINT);
@@ -723,12 +723,12 @@ int main(int argc, char** argv)
 
   if(getenv("DISPLAY"))
     xlsh_X = 1;
-  
+
   xlsh_config_init(opt_exec);
   xlsh_sys_issue(xlsh_config[XLSH_ID_ISSUE].value);
-  
+
   retvalue = xlsh_cmd_loop();
-  
+
   xlsh_config_free();
   return retvalue;
 }

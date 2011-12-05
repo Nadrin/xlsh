@@ -53,7 +53,7 @@ pid_t libxlsh_proc_exec(const char* cmdline, int flags)
   if(flags & XLSH_DETACH)
     setsid();
   sigprocmask(SIG_SETMASK, &xlsh_default_sigmask, NULL);
-  execv(argv[0], argv);  
+  execv(argv[0], argv);
   exit(EXIT_FAILURE);
 }
 
@@ -79,7 +79,7 @@ int libxlsh_pid_lock(const char* filename, pid_t pid, int flags)
 
   if((flags & XLSH_OVERWRITE) && stat(filename, &statbuf) == 0)
     return XLSH_EFOUND;
-  
+
   pidfile = fopen(filename, "w");
   if(!pidfile)
     return XLSH_ERROR;
@@ -109,11 +109,11 @@ int libxlsh_file_read(const char* filename, char** buffer, size_t* bufsize)
   }
   bytes_read = fread(*buffer, 1, filesize, file);
   fclose(file);
-  
+
   if(bytes_read != filesize) {
     free(*buffer);
     return XLSH_ERROR;
-  } 
+  }
   return XLSH_EOK;
 }
 

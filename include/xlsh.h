@@ -53,7 +53,7 @@ char* xlsh_session_getpass(char* buffer, size_t bufsize);
 char* xlsh_session_getstring(char* buffer, size_t bufsize);
 
 int xlsh_session_open(const char* service, const char* user,
-		      pam_handle_t** handle);
+                      pam_handle_t** handle);
 int xlsh_session_close(pam_handle_t* handle);
 int xlsh_session_exec(pam_handle_t* handle, const char* session, const char* arg0);
 
