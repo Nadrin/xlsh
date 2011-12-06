@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 
   char buffer[PATH_MAX];
   pid_t xserver_pid  = 0;
-  pid_t xrc_pid      = 0;
+  pid_t xterm_pid    = 0;
   pid_t xsession_pid = 0;
 
   sigset_t sigmask;
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
   while(!xlshd_quit) {
     xserver_pid  = 0;
     xsession_pid = 0;
-    xrc_pid      = 0;
+    xterm_pid      = 0;
 
     snprintf(buffer, PATH_MAX, "%s %s %s", XLSHD_XSERVER, XLSHD_XOPTIONS, opt_display);
     if((xserver_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
@@ -156,17 +156,17 @@ int main(int argc, char** argv)
     sleep(XLSHD_XWAIT);
 
     snprintf(buffer, PATH_MAX, "%s", XLSHD_TERM);
-    if((xrc_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
+    if((xterm_pid = libxlsh_proc_exec(buffer, 0)) < 0) {
       kill(xserver_pid, SIGTERM);
       retval = EXIT_FAILURE;
       break;
     }
 
     waitflag = 1;
-    waitpid(xrc_pid, &waitflag, 0);
+    waitpid(xterm_pid, &waitflag, 0);
     if(xlshd_quit) break;
 
-    snprintf(buffer, PATH_MAX, "%s/.xlsh-%d.pid", XLSHD_TMPDIR, xrc_pid);
+    snprintf(buffer, PATH_MAX, "%s/.xlsh-%d.pid", XLSHD_TMPDIR, xterm_pid);
     xsession_pid = libxlsh_pid_read(buffer);
     if(xsession_pid > 0) {
       while(!kill(xsession_pid, 0) && !xlshd_quit)
@@ -186,8 +186,8 @@ int main(int argc, char** argv)
     kill(xsession_pid, SIGTERM);
     sleep(XLSHD_XWAIT);
   }
-  if(xrc_pid > 0)
-    kill(xrc_pid, SIGTERM);
+  if(xterm_pid > 0)
+    kill(xterm_pid, SIGTERM);
   if(xserver_pid > 0) {
     waitflag = -1;
     kill(xserver_pid, SIGTERM);
