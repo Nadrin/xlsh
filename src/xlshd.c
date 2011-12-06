@@ -166,7 +166,7 @@ int main(int argc, char** argv)
     waitpid(xterm_pid, &waitflag, 0);
     if(xlshd_quit) break;
 
-    snprintf(buffer, PATH_MAX, "%s/.xlsh-%d.pid", XLSHD_TMPDIR, xterm_pid);
+    snprintf(buffer, PATH_MAX, "%s/.xlsh-%d.pid", XLSH_TMPDIR, xterm_pid);
     xsession_pid = libxlsh_pid_read(buffer);
     if(xsession_pid > 0) {
       while(!kill(xsession_pid, 0) && !xlshd_quit)
