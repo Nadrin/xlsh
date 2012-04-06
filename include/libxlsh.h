@@ -16,7 +16,6 @@ enum xlsh_ecode {
  XLSH_EDONE     = 0x02,
  XLSH_EARG      = 0x03,
  XLSH_ENOTFOUND = 0x04,
- XLSH_EFOUND    = 0x05,
  XLSH_ERROR     = 0xFF,
 };
 

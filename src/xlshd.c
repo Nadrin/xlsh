@@ -85,6 +85,7 @@ int main(int argc, char** argv)
   const char* opt_display = XLSHD_XDISPLAY;
 
   char buffer[PATH_MAX];
+  pid_t lock_pid     = 0;
   pid_t xserver_pid  = 0;
   pid_t xterm_pid    = 0;
   pid_t xsession_pid = 0;
@@ -107,20 +108,25 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  switch(libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), 0)) {
-  case XLSH_EFOUND:
-    fprintf(stderr, "%s: Pidfile %s exists, aborted\n",
+  lock_pid = libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), 0);
+  if(lock_pid == -1) {
+    fprintf(stderr, "%s: Cannot create lockfile: %s\n",
             argv[0], XLSHD_PIDFILE);
     return EXIT_FAILURE;
-  case XLSH_ERROR:
-    fprintf(stderr, "%s: Cannot create pidfile: %s\n",
-            argv[0], XLSHD_PIDFILE);
+  } else if(lock_pid > 0) {
+    fprintf(stderr, "%s: Lockfile %s is in use by %d, aborted\n",
+            argv[0], XLSHD_PIDFILE, lock_pid);
     return EXIT_FAILURE;
   }
 
   if(!opt_nodaemon) {
     xlshd_daemonize(argv[0]);
-    libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), XLSH_OVERWRITE);
+    lock_pid = libxlsh_pid_lock(XLSHD_PIDFILE, getpid(), XLSH_OVERWRITE);
+    if(lock_pid == -1) {
+      fprintf(stderr, "%s: Cannot write lockfile: %s\n",
+              argv[0], XLSHD_PIDFILE);
+      return EXIT_FAILURE;
+    }
   }
 
   stdin  = freopen("/dev/null", "r", stdin);

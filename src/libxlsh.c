@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -60,31 +61,44 @@ pid_t libxlsh_proc_exec(const char* cmdline, int flags)
 // Pid read/write functions
 pid_t libxlsh_pid_read(const char* filename)
 {
-  pid_t result  = 0;
-  FILE* pidfile = fopen(filename, "r");
+  FILE* pidfile;
+  pid_t result = -1;
+
+  pidfile = fopen(filename, "r");
   if(!pidfile)
-    return -1;
-  if(fscanf(pidfile, "%d", &result) != 1) {
-    fclose(pidfile);
-    return -1;
-  }
+    return result;
+
+  fscanf(pidfile, "%d", &result);
   fclose(pidfile);
+
   return result;
 }
 
 int libxlsh_pid_lock(const char* filename, pid_t pid, int flags)
 {
-  struct stat statbuf;
   FILE* pidfile;
+  pid_t oldpid;
 
-  if((flags & XLSH_OVERWRITE) && stat(filename, &statbuf) == 0)
-    return XLSH_EFOUND;
+  pidfile = fopen(filename, "r+");
+  if(pidfile) {
+    if(fscanf(pidfile, "%d", &oldpid) == 1) {
+      int rc = kill(oldpid, 0);
+      // process of pid still exists and XLSH_OVERWRITE not specified
+      if((rc == 0 || (rc == -1 && errno == EPERM)) && !(flags & XLSH_OVERWRITE)) {
+        fclose(pidfile);
+        return oldpid;
+      }
+      rewind(pidfile);
+    }
+  } else {
+    pidfile = fopen(filename, "w+");
+    if(!pidfile)
+      return -1;
+  }
 
-  pidfile = fopen(filename, "w");
-  if(!pidfile)
-    return XLSH_ERROR;
   fprintf(pidfile, "%d", pid);
   fclose(pidfile);
+
   return XLSH_EOK;
 }
 
