@@ -10,17 +10,18 @@
 #define XLSH_VERSION_API    2
 #define XLSH_VERSION_STRING "0.2.2"
 
-#define XLSH_EOK       0x00
-#define XLSH_EFATAL    0x01
-#define XLSH_EDONE     0x02
-#define XLSH_EARG      0x03
-#define XLSH_ENOTFOUND 0x04
-#define XLSH_EFOUND    0x05
-#define XLSH_ERROR     0xFF
+enum xlsh_ecode {
+ XLSH_EOK       = 0x00,
+ XLSH_EFATAL    = 0x01,
+ XLSH_EDONE     = 0x02,
+ XLSH_EARG      = 0x03,
+ XLSH_ENOTFOUND = 0x04,
+ XLSH_ERROR     = 0xFF,
+};
 
-#define XLSH_NORMAL    0x00
-#define XLSH_OVERWRITE 0x01
-#define XLSH_DETACH    0x02
+static const int XLSH_NORMAL    = 0x00;
+static const int XLSH_OVERWRITE = 0x01;
+static const int XLSH_DETACH    = 0x02;
 
 size_t libxlsh_strnlen(const char* s, size_t maxlen);
 void   libxlsh_proc_sigmask(void);
