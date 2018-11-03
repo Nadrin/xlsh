@@ -19,7 +19,26 @@ fi
 xrdb -merge "$XRESFILE"
 xsetroot -solid "$BGCOLOR"
 if which xdotool; then
-  ( xwindow=$(xdotool search --sync --class $TERMINAL)
-    xdotool windowfocus "$xwindow" )&
+  # There's a race condition to completion between this job focusing
+  # the login window and this script's exec spawning it. Hence the loop.
+  err=0
+  while :
+  do
+    if xwindow=$(xdotool search --sync --class "$TERMINAL")
+    then
+      if xdotool windowfocus --sync "$xwindow"
+      then break # success
+      fi
+    fi
+    err=`expr $err + 1`
+    if [ $err -gt 10 ]
+    then
+      xmessage "$0: can't focus xlsh, exceeded retry count"
+      break
+    fi
+    sleep 1
+  done &
+else
+  echo >&2 "$0: no xdotool"
 fi
 exec $TERMINAL -g 80x15+$px+$py -e $(which xlsh)
